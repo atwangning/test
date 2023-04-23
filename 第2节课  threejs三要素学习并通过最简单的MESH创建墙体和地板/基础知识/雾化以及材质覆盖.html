@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>第一个three.js文件_WebGL三维场景</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;/* 隐藏body窗口区域滚动条 */
+
+        }
+    </style>
+    <!--引入three.js三维引擎-->
+    <script src="../../lib/three.js"></script>
+</head>
+<body>
+<script>
+    /**
+     * 创建场景对象Scene
+     */
+    var scene = new THREE.Scene();
+    // 定义线性雾，密度随着距离的增加而线性增长
+
+    //scene.fog = new THREE.Fog( 0xffffff, 0.015, 100);
+    scene.overrideMaterial = new THREE.MeshLambertMaterial({color : 0xF39600 });
+
+    for ( var i = 0; i < 500; i ++ ) {
+
+        var cubeSize = Math.ceil(Math.random() * 3);
+        var cubeGeometry = new THREE.CubeGeometry(cubeSize, cubeSize, cubeSize);
+        var cubeMaterial = new THREE.MeshLambertMaterial({color: Math.random() * 0xffffff});
+        var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cube.castShadow = true;
+        cube.receiveShadow = true;
+
+        // 让随机出现的小立方位置体限制在平面之内
+        cube.position.x = -30 + Math.round((Math.random() * 100));
+        cube.position.y = 5 + Math.round((Math.random() * 5));
+        cube.position.z = -20 + Math.round((Math.random() * 100));
+
+        scene.add(cube);
+
+    }
+
+    /**
+     * 相机设置
+     */
+    var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
+    camera.position.set(-30, 40, 30);
+    camera.lookAt(scene.position);
+
+    /**
+     * 创建渲染器对象
+     */
+    var webGlRenderer = new THREE.WebGLRenderer();
+
+    webGlRenderer.antialias = true;
+    webGlRenderer.autoClear = true;
+    webGlRenderer.setClearColor(0xEEEEEE);
+    webGlRenderer.setSize(window.innerWidth, window.innerHeight);
+    webGlRenderer.shadowMap.enabled = true;
+    webGlRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    document.body.appendChild(webGlRenderer.domElement); //body元素中插入canvas对象
+
+    var ambientLight = new THREE.AmbientLight(0x0C0C0C);
+    scene.add(ambientLight);
+
+    var spotLight = new THREE.SpotLight(0xFFFFFF);
+    spotLight.position.set(-40, 60, -10);
+    spotLight.castShadow = true;
+    spotLight.shadow.mapSize.height = 2048;
+    spotLight.shadow.mapSize.width = 2048;
+    scene.add(spotLight);
+
+    //执行渲染操作   指定场景、相机作为参数
+    webGlRenderer.render(scene, camera);
+</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>第一个three.js文件_WebGL三维场景</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;/* 隐藏body窗口区域滚动条 */
+        }
+    </style>
+    <!--引入three.js三维引擎-->
+    <script src="../../lib/three.js"></script>
+    <script src="../../lib/OrbitControls.js"></script>
+</head>
+<body>
+<div id="left" style="width: 50%;height:960px;float: left;background-color: aqua"></div>
+<div id="right" style="width: 50%;height:960px;float: right;background-color: beige"></div>
+<script>
+    /**
+     * 创建场景对象Scene
+     */
+    var sceneleft = new THREE.Scene();
+    var sceneright = new THREE.Scene();
+    /**
+     * 创建网格模型
+     */
+        // var geometry = new THREE.SphereGeometry(60, 40, 40); //创建一个球体几何对象
+    var geometry = new THREE.BoxGeometry(50, 50, 50); //创建一个立方体几何对象Geometry
+    var material = new THREE.MeshLambertMaterial({
+        color: 0x0000ff
+    }); //材质对象Material，这里只是单单的给复制颜色
+    var meshleft1 = new THREE.Mesh(geometry, material); //网格模型对象Mesh
+    var meshleft2 = new THREE.Mesh(geometry, material); //网格模型对象Mesh
+    meshleft2.position.z=-400
+    var meshright1 = new THREE.Mesh(geometry, material); //网格模型对象Mesh
+    var meshright2 = new THREE.Mesh(geometry, material); //网格模型对象Mesh
+    meshright2.position.z=-400
+    sceneleft.add(meshleft1); //网格模型添加到场景中
+    sceneleft.add(meshleft2); //网格模型添加到场景中
+    sceneright.add(meshright1);
+    sceneright.add(meshright2   );
+    /**
+     * 光源设置
+     */
+        //点光源
+    var pointleft = new THREE.PointLight(0xffffff);
+    pointleft.position.set(400, 200, 300); //点光源位置
+    var pointright = new THREE.PointLight(0xffffff);
+    pointright.position.set(400, 200, 300); //点光源位置
+    sceneleft.add(pointleft); //点光源添加到场景中
+    sceneright.add(pointright);
+    //环境光
+    var ambientleft = new THREE.AmbientLight(0x444444);
+    var ambientright = new THREE.AmbientLight(0x444444);
+    sceneleft.add(ambientleft);
+    sceneright.add(ambientright);
+    // console.log(scene)
+    // console.log(scene.children)
+    /**
+     * 相机设置
+     */
+    var width = window.innerWidth/2; //窗口宽度
+    var height = window.innerHeight; //窗口高度
+    var k = width / height; //窗口宽高比
+    var s = 200; //三维场景显示范围控制系数，系数越大，显示的范围越大
+    //创建相机对象
+    var cameraleft=new THREE.PerspectiveCamera(45, window.innerWidth/2 / window.innerHeight, 0.1, 1000);
+    cameraleft.position.set(20, 50, 200); //设置相机位置
+    cameraleft.lookAt(sceneleft.position); //设置相机方向(指向的场景对象)
+
+    var cameraright = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 0.1, 1000);
+    cameraright.position.set(20, 50, 200); //设置相机位置
+    cameraright.lookAt(sceneright.position); //设置相机方向(指向的场景对象)
+    /**
+     * 创建渲染器对象
+     */
+    var rendererleft = new THREE.WebGLRenderer();
+    rendererleft.setSize(width, height);//设置渲染区域尺寸
+    rendererleft.setClearColor(0xb9d311, 1); //设置背景颜色
+
+    var rendererright = new THREE.WebGLRenderer();
+    rendererright.setSize(width, height);//设置渲染区域尺寸
+    rendererright.setClearColor(0xb9d3ff, 1); //设置背景颜色
+
+    var controlStoreleft = new THREE.OrbitControls(cameraleft, rendererleft.domElement);
+
+    controlStoreleft.dampingFactor = 0.5;
+    // 视角最小距离
+    controlStoreleft.minDistance = 0;
+    // 视角最远距离
+    controlStoreleft.maxDistance = 2000;
+    // 最大角度
+    controlStoreleft.maxPolarAngle = Math.PI / 2.2;
+
+    var controlStoreright = new THREE.OrbitControls(cameraright, rendererright.domElement);
+
+    controlStoreright.dampingFactor = 0.5;
+    // 视角最小距离
+    controlStoreright.minDistance = 0;
+    // 视角最远距离
+    controlStoreright.maxDistance = 2000;
+    // controlStoreright
+    controlStoreleft.maxPolarAngle = Math.PI / 2.2;
+
+    var containerleft = document.getElementById("left");
+    var containerright = document.getElementById("right");
+    containerleft.appendChild(rendererleft.domElement);
+    containerright.appendChild(rendererright.domElement);
+
+    function animate() {
+        rendererleft.render(sceneleft, cameraleft);
+        rendererright.render(sceneright, cameraright);
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    requestAnimationFrame(this.animate.bind(this));
+</script>
+</body>
+</html>
